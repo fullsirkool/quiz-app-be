@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  firstName     String   @map("first_name")
+  lastName      String   @map("last_name")
+  password      String
+  dateOfBirth   DateTime @map("date_of_birth")
+  gender        Gender
+  refreshToken  String?  @map("refresh_token")
+  walletAddress String?  @unique() @map("wallet_address")
+  expiredTime   Float?   @map("expired_time")
+  avatarPicture String?  @map("avatar_picture")
+  capcha        String?  @default(uuid())
+  activated     Boolean  @default(true)
+  role          RoleType
+  quizs         Quiz[]
+  results       Result[]
+}
+
+model Quiz {
+  id         Int        @id @default(autoincrement())
+  creatorId  Int        @map("creator_id")
+  categoryId Int        @map("category_id")
+  creator    User       @relation(fields: [creatorId], references: [id])
+  category   Category   @relation(fields: [categoryId], references: [id])
+  questions  Question[]
+  results    Result[]
+}
+
+model Question {
+  id            Int            @id @default(autoincrement())
+  content       String
+  quizId        Int            @map("quiz_id")
+  quiz          Quiz           @relation(fields: [quizId], references: [id])
+  answers       Answer[]
+  fileStorages  FileStorage[]
+  resultDetails ResultDetail[]
+}
+
+model FileStorage {
+  id         Int      @id @default(autoincrement())
+  url        String
+  fileType   FileType
+  questionId Int      @map("question_id")
+  question   Question @relation(fields: [questionId], references: [id])
+}
+
+model Answer {
+  id            Int            @id @default(autoincrement())
+  content       String
+  isTrue        Boolean        @map("is_true")
+  questionId    Int            @map("question_id")
+  question      Question       @relation(fields: [questionId], references: [id])
+  resultDetails ResultDetail[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  quizs Quiz[]
+}
+
+model Result {
+  id            Int            @id @default(autoincrement())
+  score         Float
+  completedAt   DateTime       @map("completed_at")
+  userId        Int            @map("user_id")
+  quizId        Int            @map("quiz_id")
+  user          User           @relation(fields: [userId], references: [id])
+  quiz          Quiz           @relation(fields: [quizId], references: [id])
+  resultDetails ResultDetail[]
+}
+
+model ResultDetail {
+  id         Int      @id @default(autoincrement())
+  correct    Boolean
+  resultId   Int      @map("result_id")
+  answerId   Int      @map("answer_id")
+  questionId Int      @map("question_id")
+  result     Result   @relation(fields: [resultId], references: [id])
+  answer     Answer   @relation(fields: [answerId], references: [id])
+  question   Question @relation(fields: [questionId], references: [id])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum RoleType {
+  STUDENT
+  TEACHER
+}
+
+enum FileType {
+  IMAGE
+  VIDEO
+}
