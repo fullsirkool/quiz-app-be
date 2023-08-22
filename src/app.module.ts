@@ -11,9 +11,10 @@ import { CategoryModule } from './category/category.module';
 import { ResultModule } from './result/result.module';
 import { ResultDetailModule } from './result-detail/result-detail.module';
 import { FilesTorageModule } from './files-torage/files-torage.module';
+import { SenderModule } from './sender/sender.module';
 
 @Module({
-  imports: [UserModule, PrismaModule, QuizModule, AuthModule, QuestionModule, AnswerModule, CategoryModule, ResultModule, ResultDetailModule, FilesTorageModule],
+  imports: [UserModule, PrismaModule, QuizModule, AuthModule, QuestionModule, AnswerModule, CategoryModule, ResultModule, ResultDetailModule, FilesTorageModule, SenderModule],
   controllers: [AppController],
   providers: [AppService],
 })
